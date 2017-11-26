@@ -1,0 +1,20 @@
+{
+    "name": "madbob/laravel-log2rss",
+    "description": "Laravel logs published in RSS",
+    "license": "GPL-3.0+",
+    "keywords": ["laravel", "logs", "rss"],
+    "authors": [
+        {
+            "name": "Roberto Guido",
+            "email": "bob@linux.it"
+        }
+    ],
+    "require": {
+        "roumen/feed": "^2.11"
+    },
+    "autoload": {
+        "psr-0": {
+            "MadBob\\LaravelLog2Rss\\": "src/"
+        }
+    }
+}

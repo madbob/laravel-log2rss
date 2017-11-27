@@ -16,5 +16,7 @@
         "psr-0": {
             "MadBob\\LaravelLog2Rss\\": "src/"
         }
-    }
+    },
+    "version": "0.1",
+    "minimum-stability": "stable"
 }

@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "roumen/feed": "^2.11"
+        "roumen/feed": "2.10.*"
     },
     "autoload": {
         "psr-0": {

@@ -4,7 +4,9 @@ namespace MadBob\LaravelLog2Rss;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
-use App;
+use View;
+
+use Roumen\Feed\Feed;
 
 class Log2RssController extends Controller
 {
@@ -59,7 +61,7 @@ class Log2RssController extends Controller
     {
         $logs = self::all();
 
-        $feed = App::make("feed");
+        $feed = new Feed();
         $feed->title = 'Logs from  ' . env('APP_NAME');
         $feed->description = 'Logs from  ' . env('APP_NAME');
         $feed->link = $request->url();
@@ -75,6 +77,7 @@ class Log2RssController extends Controller
             $feed->add($l['text'], env('APP_NAME'), '', $l['date'], $l['stack'], '');
         }
 
+        View::addLocation(base_path() . '/vendor/roumen/feed/src/views/');
         return $feed->render('rss');
     }
 }

@@ -10,13 +10,20 @@
         }
     ],
     "require": {
-        "laravelium/feed": "^3.0"
+        "laravelium/feed": "^6.0"
     },
     "autoload": {
         "psr-0": {
             "MadBob\\LaravelLog2Rss\\": "src/"
         }
     },
-    "version": "0.2",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MadBob\\LaravelLog2Rss\\Log2RssController"
+            ]
+        }
+    },
+    "version": "0.3",
     "minimum-stability": "stable"
 }

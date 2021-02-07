@@ -17,13 +17,6 @@
             "MadBob\\LaravelLog2Rss\\": "src/"
         }
     },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "MadBob\\LaravelLog2Rss\\Log2RssController"
-            ]
-        }
-    },
-    "version": "0.3",
+    "version": "0.3.1",
     "minimum-stability": "stable"
 }

@@ -18,8 +18,8 @@ By defalt, the log is published in yourbaseurl.com/logs (is it suggested to incl
 
 In the `config/log2rss.php` file you find a few options.
 
-* middleware: array of middleware groups to handle the RSS requests. You can use this to protect the route, enforce some cache or whatever. Default: []
-* prefix: by default the URL to which RSS is published is `/logs`, and you can here define a prefix for it (perhaps some random string, to hide the path and make it a little less accessible even without having to implement authenticated access in a middleware). Default: '' (empty)
+* middleware: array of middleware groups to handle the RSS requests. You can use this to protect the route, enforce some cache or whatever. Default: [] (empty)
+* prefix: by default the URL to which RSS is published is `/logs`, and you can here define a prefix for it (perhaps some random string, or even a substring of `env('APP_KEY')`, to hide the path and make it a little less accessible even without having to implement authenticated access in a middleware). Default: '' (empty)
 * log_level: minimum log level for the items to include into the feed. Default: warning
 * limit: limit of items to include into the feed. Default: 20
 

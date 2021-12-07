@@ -20,11 +20,7 @@
 
 namespace MadBob\LaravelLog2Rss;
 
-use Log;
-
 use Illuminate\Support\ServiceProvider;
-
-use MadBob\LaravelQueue\Loopback\Connectors\LoopbackConnector;
 
 class Log2RssServiceProvider extends ServiceProvider
 {

@@ -41,40 +41,62 @@ class Log2RssController extends Controller
 
     public function index(Request $request)
     {
-        $log_viewer = new LaravelLogViewer();
-        $logs = $log_viewer->all();
-
         $feed = $this->initFeed();
-        $feed->pubdate = $logs[0]['date'] ?: '1970-01-01 00:00:00';
 
         /*
             Those must be kept in order of priority
         */
         $levels = ['emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'info', 'debug'];
-
         $log_level = config('log2rss.log_level');
         $log_level_int = array_search($log_level, $levels);
         if ($log_level_int === false) {
             throw new \Exception("Invalid log level provided for Log2RSS: " . $log_level, 1);
         }
 
-        for ($i = 0, $added = 0; $i < count($logs) && $added < config('log2rss.limit'); $i++) {
-            $line = $logs[$i];
+        $log_viewer = new LaravelLogViewer();
+        $files = $log_viewer->getFiles();
+        rsort($files);
 
-            $line_log_level = array_search($line['level'], $levels);
-            if ($line_log_level > $log_level_int) {
-                continue;
+        $limit = config('log2rss.limit');
+        $total_added = 0;
+        $latest_date = null;
+
+        foreach($files as $file) {
+            $log_viewer->setFile($file);
+            $logs = $log_viewer->all();
+
+            for ($i = 0; $i < count($logs) && $total_added < $limit; $i++) {
+                $line = $logs[$i];
+
+                $line_log_level = array_search($line['level'], $levels);
+                if ($line_log_level > $log_level_int) {
+                    continue;
+                }
+
+                $date = date('r', strtotime($line['date']));
+
+                if (is_null($latest_date)) {
+                    $latest_date = $date;
+                }
+
+                $feed->addItem([
+                    'title' => sprintf('%s - %s...', $line['level'], substr($line['text'], 0, 100)),
+                    'author' => config('app.name'),
+                    'link' => '',
+                    'pubdate' => $date,
+                    'description' => $line['text'] . "\n" . nl2br($line['stack']),
+                ]);
+
+                $total_added++;
             }
 
-            $feed->addItem([
-                'title' => sprintf('%s - %s...', $line['level'], substr($line['text'], 0, 100)),
-                'author' => config('app.name'),
-                'link' => '',
-                'pubdate' => $line['date'],
-                'description' => $line['text'] . "\n" . nl2br($line['stack']),
-            ]);
+            if ($total_added >= $limit) {
+                break;
+            }
+        }
 
-            $added++;
+        if ($latest_date) {
+            $feed->pubdate = date('r', $latest_date);
         }
 
         return $feed->render('rss');

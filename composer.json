@@ -25,6 +25,15 @@
             ]
         }
     },
+    "funding": [
+        {
+            "type": "patreon",
+            "url": "https://www.patreon.com/madbob"
+        }, {
+            "type": "other",
+            "url": "https://www.paypal.com/donate/?hosted_button_id=GRKVVL3E5KZ4Q"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true
 }

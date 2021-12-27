@@ -96,7 +96,7 @@ class Log2RssController extends Controller
         }
 
         if ($latest_date) {
-            $feed->pubdate = date('r', $latest_date);
+            $feed->pubdate = $latest_date;
         }
 
         return $feed->render('rss');

@@ -74,6 +74,7 @@ class Log2RssController extends Controller
                 }
 
                 $date = date('r', strtotime($line['date']));
+                $identifier = md5($line['date'] . $line['text']);
 
                 if (is_null($latest_date)) {
                     $latest_date = $date;
@@ -82,7 +83,16 @@ class Log2RssController extends Controller
                 $feed->addItem([
                     'title' => sprintf('%s - %s...', $line['level'], substr($line['text'], 0, 100)),
                     'author' => config('app.name'),
-                    'link' => '',
+
+                    /*
+                        A unique link is required to enforce RSS feed readers to
+                        handle individually each item. But not a random one,
+                        otherwise to each update all existing items are handled
+                        as completely new ones (resulting in duplications): a
+                        reproducible MD5 hash is used
+                    */
+                    'link' => url('/') . '?' . $identifier,
+
                     'pubdate' => $date,
                     'description' => $line['text'] . "\n" . nl2br($line['stack']),
                 ]);

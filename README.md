@@ -23,8 +23,10 @@ In the `config/log2rss.php` file you find a few options.
 * log_level: minimum log level for the items to include into the feed. Default: warning
 * limit: limit of items to include into the feed. Default: 20
 
+Please note this package doesn't performs well with Laravel's `single` logging channel, as it generates files too large to be handled and are rejected by [Laravel Log Viewer](https://github.com/rap2hpoutre/laravel-log-viewer). The adoption of `daily` channel is suggested.
+
 # License
 
 This code is free software, licensed under the The GNU General Public License version 3 (GPLv3). See the LICENSE.md file for more details.
 
-Copyright (C) 2021 Roberto Guido <bob@linux.it>
+Copyright (C) 2022 Roberto Guido <bob@linux.it>

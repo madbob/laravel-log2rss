@@ -22,20 +22,23 @@ namespace MadBob\LaravelLog2Rss;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 use Rap2hpoutre\LaravelLogViewer\LaravelLogViewer;
-
-use App;
+use Carbon\Carbon;
+use FeedIo\Factory\Builder\GuzzleClientBuilder;
+use FeedIo\FeedIo;
+use FeedIo\Feed;
+use FeedIo\Feed\Item\Author;
 
 class Log2RssController extends Controller
 {
     private function initFeed()
     {
-        $feed = App::make("feed");
-        $feed->title = 'Logs from  ' . config('app.name');
-        $feed->description = 'Logs from  ' . config('app.name');
-        $feed->link = route('log2rss.index');
-        $feed->setDateFormat('datetime');
+        $feed = new Feed();
+        $feed->setTitle('Logs from  ' . config('app.name'));
+        $feed->setDescription('Logs from  ' . config('app.name'));
+        $feed->setLink(route('log2rss.index'));
         return $feed;
     }
 
@@ -61,6 +64,9 @@ class Log2RssController extends Controller
         $total_added = 0;
         $latest_date = null;
 
+        $author = new Author();
+        $author->setName(config('app.name'));
+
         foreach($files as $file) {
             $log_viewer->setFile($file);
             $logs = $log_viewer->all();
@@ -73,30 +79,31 @@ class Log2RssController extends Controller
                     continue;
                 }
 
-                $date = date('r', strtotime($line['date']));
+                $date = Carbon::parse($line['date']);
                 $identifier = md5($line['date'] . $line['text']);
 
                 if (is_null($latest_date)) {
                     $latest_date = $date;
                 }
 
-                $feed->addItem([
-                    'title' => sprintf('%s - %s...', $line['level'], substr($line['text'], 0, 100)),
-                    'author' => config('app.name'),
+				$item = $feed->newItem();
 
-                    /*
-                        A unique link is required to enforce RSS feed readers to
-                        handle individually each item. But not a random one,
-                        otherwise to each update all existing items are handled
-                        as completely new ones (resulting in duplications): a
-                        reproducible MD5 hash is used
-                    */
-                    'link' => url('/') . '?' . $identifier,
+                $item->setTitle(sprintf('%s - %s...', $line['level'], substr($line['text'], 0, 100)));
+                $item->setAuthor($author);
 
-                    'pubdate' => $date,
-                    'description' => $line['text'] . "\n" . nl2br($line['stack']),
-                ]);
+                /*
+                    A unique link is required to enforce RSS feed readers to
+                    handle individually each item. But not a random one,
+                    otherwise to each update all existing items are handled
+                    as completely new ones (resulting in duplications): a
+                    reproducible MD5 hash is used
+                */
+                $item->setLink(url('/') . '?' . $identifier);
 
+                $item->setLastModified($date);
+                $item->setContent($line['text'] . "\n\n" . $line['stack']);
+
+                $feed->add($item);
                 $total_added++;
             }
 
@@ -106,9 +113,10 @@ class Log2RssController extends Controller
         }
 
         if ($latest_date) {
-            $feed->pubdate = $latest_date;
+            $feed->setLastModified($latest_date);
         }
 
-        return $feed->render('rss');
+        $feedIo = new FeedIo((new GuzzleClientBuilder())->getClient(), Log::getLogger());
+        return $feedIo->getPsrResponse($feed, 'rss');
     }
 }
